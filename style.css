@@ -1,0 +1,373 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #000000;
+    font-family: Arial, sans-serif;
+}
+
+#container {
+    width: 100vw;
+    height: 100vh;
+}
+
+.controls-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    z-index: 10;
+    color: white;
+    backdrop-filter: blur(5px);
+}
+
+.controls-container label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.controls-container textarea {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: white;
+    width: 350px; /* Tăng chiều rộng */
+    resize: vertical; /* Cho phép thay đổi chiều cao */
+    font-size: 14px;
+}
+
+.controls-container button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    background-color: #f20044;
+    color: white;
+    cursor: pointer;
+    margin-top: 10px;
+    display: block; /* Hiển thị nút ở dòng mới */
+}
+/* ======================================================= */
+/* MỚI: ĐỊNH DẠNG CHO NÚT CHỨC NĂNG MỚI                  */
+/* ======================================================= */
+
+#features-button {
+    /* Vị trí */
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10; /* Quan trọng: Đảm bảo nút luôn nằm trên cùng */
+
+    /* Kích thước và Hình dạng */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* Đây là bí quyết để tạo hình tròn */
+
+    /* Giao diện */
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    color: white;
+    cursor: pointer; /* Biến con trỏ thành hình bàn tay khi di chuột qua */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Tạo chiều sâu */
+    
+    /* Căn giữa dấu '+' bên trong */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Định dạng cho dấu '+' */
+    font-size: 32px;
+    font-weight: 300; /* Làm cho dấu + mảnh hơn, thanh thoát hơn */
+    line-height: 50px; /* Căn chỉnh chiều dọc cho một số trình duyệt cũ */
+    user-select: none; /* Ngăn người dùng vô tình bôi đen dấu '+' */
+    
+    /* Hiệu ứng chuyển động mượt mà */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Hiệu ứng khi di chuột qua */
+#features-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1); /* Phóng to nhẹ nút lên */
+}
+
+/* Hiệu ứng khi nhấn nút */
+#features-button:active {
+    transform: scale(0.95); /* Thu nhỏ nhẹ nút lại */
+}
+/* ======================================================= */
+/* MỚI: ĐỊNH DẠNG CHO MENU CÀI ĐẶT VÀ POPUP CREDITS      */
+/* ======================================================= */
+
+/* --- Menu Cài Đặt --- */
+#settings-menu {
+    position: absolute;
+    top: 80px; /* Nằm ngay dưới nút chức năng */
+    right: 20px;
+    z-index: 20;
+    
+    background-color: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    
+    /* Trạng thái ẩn ban đầu */
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none; /* Không thể click khi đang bị ẩn */
+
+    /* Hiệu ứng chuyển động */
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Lớp 'visible' sẽ được thêm bằng JS để hiện menu */
+#settings-menu.visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto; /* Cho phép click khi hiện ra */
+}
+
+#settings-menu h3 {
+    margin-top: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* Style cho bộ chọn màu */
+.setting-item input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: transparent; /* Ẩn nền mặc định */
+}
+.setting-item input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+.setting-item input[type="color"]::-webkit-color-swatch {
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+
+#credits-button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#credits-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Popup Credits (Cập nhật tương tự) --- */
+#credits-popup {
+    position: fixed; /* Fixed để luôn ở giữa màn hình */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 30; /* Nằm trên cả menu cài đặt */
+    
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Trạng thái ẩn ban đầu */
+    opacity: 0;
+    pointer-events: none;
+
+    /* Hiệu ứng chuyển động */
+    transition: opacity 0.3s ease;
+}
+
+#credits-popup.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+#credits-popup.visible .popup-content {
+    pointer-events: auto;
+}
+
+/* --- Popup Credits --- */
+#credits-popup {
+    position: fixed; /* Fixed để luôn ở giữa màn hình */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 30; /* Nằm trên cả menu cài đặt */
+    
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Hiệu ứng chuyển động */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+#credits-popup.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.popup-content {
+    background-color: #1e1e1e;
+    padding: 30px 40px;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+
+    /* Hiệu ứng khi popup hiện ra */
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+#credits-popup.visible .popup-content {
+    transform: scale(1);
+}
+
+#close-popup-button {
+    padding: 10px 30px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f20044;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#close-popup-button:hover {
+    background-color: #c00033;
+}
+
+/* Lớp tiện ích để ẩn/hiện */
+.hidden {
+    display: none;
+}
+/* ======================================================= */
+/* MỚI: ĐỊNH DẠNG CHO AVATAR TRONG POPUP CREDITS         */
+/* ======================================================= */
+
+.avatar-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%; /* Đây là bí quyết để tạo hình tròn */
+    
+    /* Thêm một đường viền đẹp mắt theo màu chủ đạo */
+    border: 3px solid #f20044; 
+    
+    /* Quan trọng: Cắt bỏ phần ảnh thừa bên ngoài hình tròn */
+    overflow: hidden; 
+    
+    /* Tự động căn giữa avatar theo chiều ngang và tạo khoảng cách bên dưới */
+    margin: 0 auto 20px auto; 
+    
+    /* Thêm hiệu ứng đổ bóng để tạo chiều sâu */
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.5); 
+}
+
+.avatar-container img {
+    width: 100%;
+    height: 100%;
+    
+    /* Quan trọng: Đảm bảo ảnh lấp đầy khung tròn mà không bị méo */
+    /* Nó sẽ tự động phóng to và cắt ảnh để vừa vặn nhất */
+    object-fit: cover; 
+}
+/* ======================================================= */
+/* MỚI: ĐỊNH DẠNG CHO NÚT ĐIỀU KHIỂN ÂM THANH            */
+/* ======================================================= */
+
+.music-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    
+    /* Căn giữa icon loa */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.music-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.music-button:active {
+    transform: scale(0.9);
+}
+/* ======================================================= */
+/* MỚI: ĐỊNH DẠNG CHO TÍNH NĂNG TẠO LINK & QR           */
+/* ======================================================= */
+
+/* Nút tạo link mới */
+#generate-link-button {
+    background-color: #2a7a2a; /* Màu xanh lá */
+}
+#generate-link-button:hover {
+    background-color: #3a9a3a;
+}
+
+/* Popup QR */
+#qr-popup .popup-content {
+    width: 350px; /* Rộng hơn một chút */
+}
+#qrcode-container {
+    padding: 15px;
+    background-color: white;
+    border-radius: 5px;
+    margin: 20px auto;
+    width: fit-content; /* Tự co lại để vừa với mã QR */
+}
+#shareable-link-input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* QUAN TRỌNG: Logic ẩn/hiện chế độ */
+/* Khi body có class 'viewer-mode', ẩn bảng điều khiển bên trái đi */
+body.viewer-mode .controls-container {
+    display: none;
+}

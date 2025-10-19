@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lời Chúc 20/10</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Giao diện điều khiển bên trái -->
+    <div class="controls-container">
+        <label for="wishes-textarea">Nhập các lời chúc (mỗi lời chúc một dòng):</label>
+        <textarea id="wishes-textarea" rows="4">
+Chúc Em ngày 20.10 thật nhiều niềm vui và hạnh phúc
+Chúc đóa hồng luôn xinh đẹp và tỏa ngát hương
+Coding by HCMUS.NhatNguyenYuna with love 
+Lời yêu thương gửi đến Em nhân ngày Phụ nữ Việt Nam
+Khoa Điện tử - Viễn thông chúc mừng ngày 20/10
+        </textarea>
+        <label for="secret-wish-input" style="margin-top: 15px;">Lời nhắn bí mật (sẽ hiện trong tim):</label>
+        <input type="text" id="secret-wish-input" value="♥ Yuna ♥">        
+        <button id="update-button">Cập nhật</button>
+        <!-- MỚI: Thêm nút tạo link và QR -->
+        <button id="generate-link-button">Tạo Link & QR</button>
+
+        <!-- ... (div id="features-button" và các popup khác) ... -->
+
+        <!-- MỚI: Popup để hiển thị mã QR (ẩn ban đầu) -->
+        <div id="qr-popup" class="hidden">
+            <div class="popup-content">
+                <h3>Link của bạn đã sẵn sàng!</h3>
+                <p>Quét mã QR hoặc sao chép link bên dưới:</p>
+                <div id="qrcode-container"></div>
+                <input type="text" id="shareable-link-input" readonly>
+                <button id="close-qr-popup-button">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nút chức năng bên phải -->
+    <div id="features-button">+</div>
+
+    <!-- Menu cài đặt (ẩn ban đầu) -->
+    <div id="settings-menu" class="hidden">
+        <h3>Tùy Chỉnh</h3>
+        
+        <div class="setting-item">
+            <label for="heart-color-picker">Màu Trái Tim:</label>
+            <input type="color" id="heart-color-picker" value="#ff3366">
+        </div>
+
+        <div class="setting-item">
+            <label for="stars-color-picker">Màu Nền Sao:</label>
+            <input type="color" id="stars-color-picker" value="#ffffff">
+        </div>
+        <div class="setting-item">
+            <label>Âm Nhạc:</label>
+            <div id="music-toggle-button" class="music-button">🔊</div>
+        </div>
+        <button id="credits-button">Credits</button>
+    </div>
+
+    <!-- Popup Credits (ẩn ban đầu) -->
+    <div id="credits-popup" class="hidden">
+        <div class="popup-content">
+            <h3>Credits</h3>
+            <div class="avatar-container">
+                <!-- THAY ĐỔI DÒNG NÀY để trỏ đến ảnh của bạn -->
+                <img src="images/avatar.jpg" alt="Ảnh đại diện">
+            </div>
+            <h4>From NhatNguyen FETEL@HCMUS with ❤️</h4>
+            <p>Facebook: Ngô Nhật Nguyên</p>
+            <button id="close-popup-button">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Container chính cho khung cảnh 3D -->
+    <div id="container"></div>
+
+    <!-- Tải các thư viện và script chính -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
