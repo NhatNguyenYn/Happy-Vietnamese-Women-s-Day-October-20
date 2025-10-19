@@ -51,40 +51,44 @@ const CONFIG = {
 function applyUrlParameters() {
     const params = new URLSearchParams(window.location.search);
 
-    // Nếu không có tham số nào, không làm gì cả (đang ở chế độ Người tạo)
     if (!params.has('wishes')) {
         return;
     }
 
-    // Nếu có tham số, chúng ta đang ở chế độ Người nhận
     document.body.classList.add('viewer-mode');
 
-    // 1. Áp dụng màu sắc
-    const heartColor = params.get('heartColor');
-    const starsColor = params.get('starsColor');
-    if (heartColor && heartParticles) {
-        heartParticles.material.color.set(heartColor);
+    // 1. Áp dụng màu sắc (thêm lại dấu '#')
+    const heartColorParam = params.get('heartColor');
+    const starsColorParam = params.get('starsColor');
+    if (heartColorParam) {
+        const heartColor = '#' + heartColorParam;
+        if (heartParticles) heartParticles.material.color.set(heartColor);
         document.getElementById('heart-color-picker').value = heartColor;
     }
-    if (starsColor && stars) {
-        stars.material.color.set(starsColor);
+    if (starsColorParam) {
+        const starsColor = '#' + starsColorParam;
+        if (stars) stars.material.color.set(starsColor);
         document.getElementById('stars-color-picker').value = starsColor;
     }
 
-    // 2. Áp dụng các lời chúc
+    // 2. Áp dụng các lời chúc (GIẢI MÃ)
     const wishesParam = params.get('wishes');
     if (wishesParam) {
-        const wishes = wishesParam.split('|'); // Tách các lời chúc bằng dấu |
+        const wishes = decodeURIComponent(wishesParam).split('|');
         document.getElementById('wishes-textarea').value = wishes.join('\n');
-        updateWishes();
     }
 
-    // 3. Áp dụng lời nhắn bí mật
-    const secretWish = params.get('secret');
-    if (secretWish) {
-        document.getElementById('secret-wish-input').value = secretWish;
-        updateWishes(); // Gọi lại để tạo lời nhắn mới
+    // 3. Áp dụng lời nhắn bí mật (GIẢI MÃ)
+    const secretWishParam = params.get('secret');
+    if (secretWishParam) {
+        document.getElementById('secret-wish-input').value = decodeURIComponent(secretWishParam);
     }
+    
+    // 4. Quan trọng: Sau khi đã điền dữ liệu, gọi updateWishes để dựng lại cảnh 3D
+    // Dùng setTimeout để đảm bảo font đã sẵn sàng
+    setTimeout(() => {
+        updateWishes();
+    }, 100); 
 }
 
 // --- KHỞI TẠO (PHIÊN BẢN ĐÃ SẮP XẾP LẠI VÀ SỬA LỖI) ---
@@ -188,7 +192,7 @@ function init() {
             }
         });
     }
-    // MỚI: Logic cho nút tạo Link & QR
+// MỚI: Logic cho nút tạo Link & QR (PHIÊN BẢN ĐÃ SỬA LỖI MÃ HÓA)
     const generateLinkButton = document.getElementById('generate-link-button');
     const qrPopup = document.getElementById('qr-popup');
     const closeQrPopupButton = document.getElementById('close-qr-popup-button');
@@ -197,18 +201,20 @@ function init() {
 
     if (generateLinkButton) {
         generateLinkButton.addEventListener('click', () => {
-            // 1. Thu thập tất cả dữ liệu tùy chỉnh
+            // 1. Thu thập dữ liệu
             const heartColor = document.getElementById('heart-color-picker').value;
             const starsColor = document.getElementById('stars-color-picker').value;
             const secretWish = document.getElementById('secret-wish-input').value;
             const wishes = document.getElementById('wishes-textarea').value.split('\n').filter(line => line.trim() !== '');
 
-            // 2. Xây dựng chuỗi tham số URL (mã hóa các giá trị)
+            // 2. Xây dựng tham số, MÃ HÓA các giá trị
             const params = new URLSearchParams();
-            params.set('heartColor', heartColor);
-            params.set('starsColor', starsColor);
-            params.set('secret', secretWish);
-            params.set('wishes', wishes.join('|')); // Nối các lời chúc bằng dấu |
+            // Bỏ dấu '#' khỏi màu trước khi mã hóa
+            params.set('heartColor', heartColor.substring(1)); 
+            params.set('starsColor', starsColor.substring(1));
+            // Mã hóa các chuỗi văn bản để an toàn cho URL
+            params.set('secret', encodeURIComponent(secretWish));
+            params.set('wishes', encodeURIComponent(wishes.join('|')));
 
             // 3. Tạo link cuối cùng
             const baseUrl = window.location.origin + window.location.pathname;
@@ -216,14 +222,11 @@ function init() {
 
             // 4. Hiển thị link và tạo mã QR
             shareableLinkInput.value = shareableLink;
-            qrcodeContainer.innerHTML = ''; // Xóa mã QR cũ nếu có
+            qrcodeContainer.innerHTML = '';
             new QRCode(qrcodeContainer, {
                 text: shareableLink,
                 width: 256,
                 height: 256,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
             });
             
             // 5. Hiện popup
