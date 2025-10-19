@@ -380,7 +380,7 @@ function loadFontAndUpdate() {
     const updateButton = document.getElementById('update-button');
     updateButton.disabled = true;
 
-    fontLoader.load('vietnamese_font.json', (font) => {
+    fontLoader.load('./vietnamese_font.json', (font) => {
         loadedFont = font;
         updateButton.disabled = false;
         
