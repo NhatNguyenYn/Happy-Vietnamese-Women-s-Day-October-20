@@ -192,46 +192,66 @@ function init() {
             }
         });
     }
-// MỚI: Logic cho nút tạo Link & QR (PHIÊN BẢN ĐÃ SỬA LỖI MÃ HÓA)
-    const generateLinkButton = document.getElementById('generate-link-button');
+// MỚI: Logic cho nút tạo Link & QR (PHIÊN BẢN CUỐI CÙNG VỚI TÍNH NĂNG RÚT GỌN LINK)
+    const generateLinkButton = document.getElementById('generate--button');
     const qrPopup = document.getElementById('qr-popup');
     const closeQrPopupButton = document.getElementById('close-qr-popup-button');
     const qrcodeContainer = document.getElementById('qrcode-container');
     const shareableLinkInput = document.getElementById('shareable-link-input');
 
     if (generateLinkButton) {
-        generateLinkButton.addEventListener('click', () => {
-            // 1. Thu thập dữ liệu
+        generateLinkButton.addEventListener('click', async () => { // <-- Thay đổi: Thêm "async"
+            // Hiển thị trạng thái "Đang tạo..." cho người dùng
+            generateLinkButton.textContent = 'Đang tạo...';
+            generateLinkButton.disabled = true;
+
+            // 1. Thu thập dữ liệu (không đổi)
             const heartColor = document.getElementById('heart-color-picker').value;
             const starsColor = document.getElementById('stars-color-picker').value;
             const secretWish = document.getElementById('secret-wish-input').value;
             const wishes = document.getElementById('wishes-textarea').value.split('\n').filter(line => line.trim() !== '');
 
-            // 2. Xây dựng tham số, MÃ HÓA các giá trị
+            // 2. Xây dựng tham số và mã hóa (không đổi)
             const params = new URLSearchParams();
-            // Bỏ dấu '#' khỏi màu trước khi mã hóa
-            params.set('heartColor', heartColor.substring(1)); 
+            params.set('heartColor', heartColor.substring(1));
             params.set('starsColor', starsColor.substring(1));
-            // Mã hóa các chuỗi văn bản để an toàn cho URL
             params.set('secret', encodeURIComponent(secretWish));
             params.set('wishes', encodeURIComponent(wishes.join('|')));
 
-            // 3. Tạo link cuối cùng
+            // 3. Tạo link dài ban đầu
             const baseUrl = window.location.origin + window.location.pathname;
-            const shareableLink = `${baseUrl}?${params.toString()}`;
+            const longUrl = `${baseUrl}?${params.toString()}`;
 
-            // 4. Hiển thị link và tạo mã QR
-            shareableLinkInput.value = shareableLink;
-            qrcodeContainer.innerHTML = '';
-            new QRCode(qrcodeContainer, {
-                text: shareableLink,
-                width: 256,
-                height: 256,
-            });
-            
-            // 5. Hiện popup
-            qrPopup.classList.remove('hidden');
-            qrPopup.classList.add('visible');
+            // 4. MỚI: Gọi API của TinyURL để rút gọn link
+            try {
+                const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const shortUrl = await response.text();
+
+                // 5. Hiển thị link NGẮN và tạo mã QR từ link NGẮN
+                shareableLinkInput.value = shortUrl;
+                qrcodeContainer.innerHTML = '';
+                new QRCode(qrcodeContainer, {
+                    text: shortUrl, // <-- Dùng link ngắn ở đây
+                    width: 256,
+                    height: 256,
+                });
+
+                // 6. Hiện popup
+                qrPopup.classList.remove('hidden');
+                qrPopup.classList.add('visible');
+
+            } catch (error) {
+                console.error('Lỗi khi rút gọn link:', error);
+                alert('Đã xảy ra lỗi khi tạo link chia sẻ. Vui lòng thử lại.');
+                shareableLinkInput.value = longUrl; // Hiển thị link dài nếu bị lỗi
+            } finally {
+                 // Trả lại trạng thái ban đầu cho nút
+                generateLinkButton.textContent = 'Tạo Link & QR';
+                generateLinkButton.disabled = false;
+            }
         });
     }
 
