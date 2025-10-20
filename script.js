@@ -2,6 +2,7 @@ let scene, camera, renderer, controls, heartParticles, loadedFont;
 let stars, originalHeartPositions, originalStarPositions, targetPositions;
 let backgroundMusic, listener;
 let secretWishMesh;
+let qrcodeInstance = null;
 const ringGroups = [];
 
 // ===================================================================
@@ -225,27 +226,35 @@ function init() {
             // Chúng ta phải mã hóa toàn bộ link dài để nó trở thành một giá trị tham số hợp lệ
             const shortUrl = `https://by.com.vn/q/?u=${encodeURIComponent(longUrl)}`;
 
-            // 5. Hiển thị link NGẮN và tạo mã QR từ link NGẮN
+            // --------------------------------------------------------
+            // BẮT ĐẦU PHẦN SỬA LỖI QUAN TRỌNG
+            // --------------------------------------------------------
+
+            // Hiển thị link trong ô input
             shareableLinkInput.value = shortUrl;
-            qrcodeContainer.innerHTML = ''; // Xóa mã QR cũ
-            new QRCode(qrcodeContainer, {
-                text: shortUrl, // <-- Dùng link ngắn ở đây
-                width: 256,
-                height: 256,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
+
+            // BƯỚC A: Dọn dẹp triệt để mã QR cũ
+            if (qrcodeInstance) {
+                qrcodeInstance.clear(); // Sử dụng phương thức clear() của thư viện
+            }
+            qrcodeContainer.innerHTML = ''; // Dọn dẹp thêm các phần tử DOM còn sót lại
+
+            // BƯỚC B: Tạo mã QR mới và lưu lại instance để có thể dọn dẹp ở lần sau
+            try {
+                qrcodeInstance = new QRCode(qrcodeContainer, {
+                    text: shortUrl,
+                    width: 256,
+                    height: 256,
+                });
+            } catch (e) {
+                console.error("Lỗi nghiêm trọng khi tạo mã QR:", e);
+                alert("Đã xảy ra lỗi khi tạo mã QR. Vui lòng thử làm mới trang.");
+                return; // Dừng lại nếu có lỗi
+            }
             
-            // 6. Hiện popup
+            // Hiện popup
             qrPopup.classList.remove('hidden');
             qrPopup.classList.add('visible');
-        });
-    }
-    
-    if(closeQrPopupButton) {
-        closeQrPopupButton.addEventListener('click', () => {
-            qrPopup.classList.remove('visible');
         });
     }
 
