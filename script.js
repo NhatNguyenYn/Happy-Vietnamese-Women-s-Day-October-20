@@ -9,38 +9,39 @@ const ringGroups = [];
 // ===================================================================
 const CONFIG = {
     particleCount: 20000,
-    heartYOffset: 11,
-    ringsYOffset: -11,
+    heartYOffset: 5,
+    ringsYOffset: -5,
     
-    // MỚI: Tinh chỉnh nhịp đập của tim
     heartBeat: {
-        frequency: 0.005, // Tốc độ đập (số càng lớn càng nhanh)
-        amplitude: 0.05   // Biên độ đập (số càng lớn, tim càng co giãn nhiều)
+        frequency: 0.005,
+        amplitude: 0.05
     },
 
-    // MỚI: Tinh chỉnh nền trời sao
     starField: {
-        starCount: 5000, // Số lượng ngôi sao
-        starSize: 0.5,    // Kích thước sao
+        starCount: 5000,
+        starSize: 0.5,
         shootingStar: {
-            count: 5,     // Số lượng sao băng có trên trời cùng lúc
-            speed: 5,     // Tốc độ bay (giá trị lớn hơn cho dễ thấy)
-            tailLength: 0.2 // Độ dài của vệt sao băng (0 -> 1)
-        },  
-        cameraIntro: {
-        duration: 5, // Tổng thời gian của hành trình (tính bằng giây)
-        zoomOutDelay: 2 // Sau bao nhiêu giây thì bắt đầu lùi ra xa
+            count: 5,
+            speed: 5,
+            tailLength: 0.2
+        }        
     },
-        secretWish: {
-            revealDelay: 6, // Sau bao nhiêu giây thì lời nhắn hiện ra (tính từ lúc tải trang)
-            fadeInDuration: 3 // Thời gian để lời nhắn hiện ra hoàn toàn
-        }         
-    },
-    // MỚI: Tinh chỉnh hiệu ứng xuất hiện
+
     fadeIn: {
-        speed: 0.005 // Tốc độ hiện ra (số càng lớn càng nhanh)
+        speed: 0.005
+    },
+
+    cameraIntro: {
+        duration: 3
+    },
+
+    // =======================================================
+    // MỚI: Thêm lại khối này
+    // =======================================================
+    secretWish: {
+        revealDelay: 4, // Hiện ra sau 4s (sau khi intro kết thúc)
+        fadeInDuration: 3 // Thời gian để hiện ra hoàn toàn
     }
-    
 };
 // ===================================================================
 // ================================================================
@@ -192,69 +193,56 @@ function init() {
             }
         });
     }
-// MỚI: Logic cho nút tạo Link & QR (PHIÊN BẢN CUỐI CÙNG VỚI TÍNH NĂNG RÚT GỌN LINK)
-    const generateLinkButton = document.getElementById('generate--button');
+// ================================================================
+    // LOGIC CHO NÚT TẠO LINK & QR (PHIÊN BẢN CUỐI CÙNG VỚI by.com.vn)
+    // ================================================================
+    const generateLinkButton = document.getElementById('generate-link-button');
     const qrPopup = document.getElementById('qr-popup');
     const closeQrPopupButton = document.getElementById('close-qr-popup-button');
     const qrcodeContainer = document.getElementById('qrcode-container');
     const shareableLinkInput = document.getElementById('shareable-link-input');
 
     if (generateLinkButton) {
-        generateLinkButton.addEventListener('click', async () => { // <-- Thay đổi: Thêm "async"
-            // Hiển thị trạng thái "Đang tạo..." cho người dùng
-            generateLinkButton.textContent = 'Đang tạo...';
-            generateLinkButton.disabled = true;
-
-            // 1. Thu thập dữ liệu (không đổi)
+        generateLinkButton.addEventListener('click', () => {
+            // 1. Thu thập dữ liệu tùy chỉnh (không đổi)
             const heartColor = document.getElementById('heart-color-picker').value;
             const starsColor = document.getElementById('stars-color-picker').value;
             const secretWish = document.getElementById('secret-wish-input').value;
             const wishes = document.getElementById('wishes-textarea').value.split('\n').filter(line => line.trim() !== '');
 
-            // 2. Xây dựng tham số và mã hóa (không đổi)
+            // 2. Xây dựng chuỗi tham số URL (không đổi)
             const params = new URLSearchParams();
             params.set('heartColor', heartColor.substring(1));
             params.set('starsColor', starsColor.substring(1));
             params.set('secret', encodeURIComponent(secretWish));
             params.set('wishes', encodeURIComponent(wishes.join('|')));
 
-            // 3. Tạo link dài ban đầu
+            // 3. Tạo link dài ban đầu (không đổi)
             const baseUrl = window.location.origin + window.location.pathname;
             const longUrl = `${baseUrl}?${params.toString()}`;
 
-            // 4. MỚI: Gọi API của TinyURL để rút gọn link
-            try {
-                const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const shortUrl = await response.text();
+            // 4. MỚI: Xây dựng link rút gọn bằng dịch vụ by.com.vn
+            // Chúng ta phải mã hóa toàn bộ link dài để nó trở thành một giá trị tham số hợp lệ
+            const shortUrl = `https://by.com.vn/q/?u=${encodeURIComponent(longUrl)}`;
 
-                // 5. Hiển thị link NGẮN và tạo mã QR từ link NGẮN
-                shareableLinkInput.value = shortUrl;
-                qrcodeContainer.innerHTML = '';
-                new QRCode(qrcodeContainer, {
-                    text: shortUrl, // <-- Dùng link ngắn ở đây
-                    width: 256,
-                    height: 256,
-                });
-
-                // 6. Hiện popup
-                qrPopup.classList.remove('hidden');
-                qrPopup.classList.add('visible');
-
-            } catch (error) {
-                console.error('Lỗi khi rút gọn link:', error);
-                alert('Đã xảy ra lỗi khi tạo link chia sẻ. Vui lòng thử lại.');
-                shareableLinkInput.value = longUrl; // Hiển thị link dài nếu bị lỗi
-            } finally {
-                 // Trả lại trạng thái ban đầu cho nút
-                generateLinkButton.textContent = 'Tạo Link & QR';
-                generateLinkButton.disabled = false;
-            }
+            // 5. Hiển thị link NGẮN và tạo mã QR từ link NGẮN
+            shareableLinkInput.value = shortUrl;
+            qrcodeContainer.innerHTML = ''; // Xóa mã QR cũ
+            new QRCode(qrcodeContainer, {
+                text: shortUrl, // <-- Dùng link ngắn ở đây
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            // 6. Hiện popup
+            qrPopup.classList.remove('hidden');
+            qrPopup.classList.add('visible');
         });
     }
-
+    
     if(closeQrPopupButton) {
         closeQrPopupButton.addEventListener('click', () => {
             qrPopup.classList.remove('visible');
